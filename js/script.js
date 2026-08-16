@@ -161,7 +161,7 @@ const venueData = {
       });
     });
 
-    ["#cuisine", "#dish", "#foodMood", "#drink", "#notes"].forEach(sel => {
+    ["#dish", "#foodMood", "#drink", "#notes"].forEach(sel => {
       q(sel).addEventListener(sel === "#notes" ? "input" : "change", () => {
         clearStatus();
         updateSummary();
@@ -194,7 +194,6 @@ const venueData = {
 
       if (state.type === "Ресторан") {
         const food = restaurantDetails();
-        payload["Кухня"] = food.cuisine;
         payload["Блюдо"] = food.dish;
         payload["Формат еды"] = food.foodMood;
         payload["Напитки"] = food.drink;
