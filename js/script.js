@@ -28,7 +28,7 @@ const venueData = {
     // ВСТАВЬ СЮДА СВОЙ WEB3FORMS ACCESS KEY
     // Пример: const WEB3FORMS_ACCESS_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
     // ============================================================
-    const WEB3FORMS_ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
+    const WEB3FORMS_ACCESS_KEY = "c7caf6a7-9c19-4e3d-be8d-f835d043c0b8";
 
     const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
