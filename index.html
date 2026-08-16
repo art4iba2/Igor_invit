@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Виктория, выбирай наш идеальный вечер ✨</title>
+  <meta name="description" content="Интерактивное приглашение для Виктории — выбери дату, время и место для встречи в Ульяновске." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="sparkle s1">✦</div>
+  <div class="sparkle s2">♡</div>
+  <div class="sparkle s3">✧</div>
+  <div class="sparkle s4">⋆</div>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">✨ Маленькое приглашение специально для тебя</div>
+      <h1>Виктория, <span class="gradient-text">выбирай наш вечер</span></h1>
+      <p class="lead">
+        Никаких сложных планов: просто отметь удобные дату, время и место.
+        Остальное — моя забота 💌
+      </p>
+    </section>
+
+    <section class="card planner">
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <div class="step">Шаг 1</div>
+            <h2>Когда встречаемся?</h2>
+            <p class="hint">Выбери один день с 24 по 30 августа 2026.</p>
+          </div>
+        </div>
+        <div class="grid dates" id="dates">
+          <div class="choice"><input type="radio" name="date" id="d24" value="24 августа, понедельник"><label for="d24"><strong>24 августа</strong><small>Понедельник</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d25" value="25 августа, вторник"><label for="d25"><strong>25 августа</strong><small>Вторник</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d26" value="26 августа, среда"><label for="d26"><strong>26 августа</strong><small>Среда</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d27" value="27 августа, четверг"><label for="d27"><strong>27 августа</strong><small>Четверг</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d28" value="28 августа, пятница"><label for="d28"><strong>28 августа</strong><small>Пятница</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d29" value="29 августа, суббота"><label for="d29"><strong>29 августа</strong><small>Суббота</small></label></div>
+          <div class="choice"><input type="radio" name="date" id="d30" value="30 августа, воскресенье"><label for="d30"><strong>30 августа</strong><small>Воскресенье</small></label></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <div class="step">Шаг 2</div>
+            <h2>Во сколько тебе удобно?</h2>
+          </div>
+        </div>
+        <div class="grid times">
+          <div class="choice"><input type="radio" name="time" id="t1" value="16:00–18:00"><label for="t1"><span class="emoji">🌤️</span><strong>16:00–18:00</strong><small>Спокойное начало</small></label></div>
+          <div class="choice"><input type="radio" name="time" id="t2" value="18:00–20:00"><label for="t2"><span class="emoji">🌇</span><strong>18:00–20:00</strong><small>Золотой час</small></label></div>
+          <div class="choice"><input type="radio" name="time" id="t3" value="20:00–22:00"><label for="t3"><span class="emoji">🌙</span><strong>20:00–22:00</strong><small>Классический вечер</small></label></div>
+          <div class="choice"><input type="radio" name="time" id="t4" value="22:00–00:00"><label for="t4"><span class="emoji">✨</span><strong>22:00–00:00</strong><small>Ночной вайб</small></label></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div>
+            <div class="step">Шаг 3</div>
+            <h2>Какой формат выбираем?</h2>
+            <p class="hint">После выбора покажу несколько вариантов в Ульяновске.</p>
+          </div>
+        </div>
+
+        <div class="grid places">
+          <div class="choice"><input type="radio" name="type" id="restaurant" value="Ресторан"><label for="restaurant"><span class="emoji">🍽️</span><strong>Ресторан</strong><small>Вкусно и неспешно</small></label></div>
+          <div class="choice"><input type="radio" name="type" id="bar" value="Бар"><label for="bar"><span class="emoji">🍸</span><strong>Бар</strong><small>Коктейли и разговоры</small></label></div>
+          <div class="choice"><input type="radio" name="type" id="park" value="Парк"><label for="park"><span class="emoji">🌿</span><strong>Парк</strong><small>Прогулка и воздух</small></label></div>
+          <div class="choice"><input type="radio" name="type" id="cinema" value="Кинотеатр"><label for="cinema"><span class="emoji">🎬</span><strong>Кинотеатр</strong><small>Фильм и попкорн</small></label></div>
+        </div>
+
+        <div class="venue-list" id="venueList"></div>
+
+        <div class="restaurant-options" id="restaurantOptions">
+          <h3>А теперь — гастрономическая часть 😌</h3>
+          <p>Можно выбрать настроение по еде, даже если конкретный ресторан пока не определён.</p>
+          <div class="field-grid">
+            <label class="field">
+              <span>Предпочтительная кухня</span>
+              <select id="cuisine">
+                <option value="">Не важно — удиви меня</option>
+                <option>Грузинская</option>
+                <option>Русская</option>
+                <option>Итальянская</option>
+                <option>Европейская</option>
+                <option>Азиатская</option>
+                <option>Японская</option>
+                <option>Паназиатская</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Что хочется больше всего</span>
+              <select id="dish">
+                <option value="">Выберу на месте</option>
+                <option>Хинкали / хачапури</option>
+                <option>Паста / ризотто</option>
+                <option>Пицца</option>
+                <option>Стейк / мясо</option>
+                <option>Рыба / морепродукты</option>
+                <option>Суши / роллы</option>
+                <option>Салаты / лёгкая еда</option>
+                <option>Десерты</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Какой формат еды?</span>
+              <select id="foodMood">
+                <option value="">Без разницы</option>
+                <option>Полноценный ужин</option>
+                <option>Лёгкий перекус</option>
+                <option>Десерт + напиток</option>
+                <option>Хочу попробовать что-то новое</option>
+                <option>Главное — уют и разговоры</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span>Напитки</span>
+              <select id="drink">
+                <option value="">На месте решу</option>
+                <option>Кофе / чай</option>
+                <option>Лимонады</option>
+                <option>Вино</option>
+                <option>Коктейли</option>
+                <option>Безалкогольные коктейли</option>
+              </select>
+            </label>
+
+            <label class="field full">
+              <span>Ещё пожелания</span>
+              <textarea id="notes" placeholder="Например: хочется тихое место, столик у окна, без острой еды, красивый интерьер..."></textarea>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-wrap">
+        <div class="summary">
+          <div class="step">Наш план</div>
+          <h2>Вот что получилось 💫</h2>
+          <div class="summary-row"><span>Дата</span><strong id="sumDate">Пока не выбрана</strong></div>
+          <div class="summary-row"><span>Время</span><strong id="sumTime">Пока не выбрано</strong></div>
+          <div class="summary-row"><span>Формат</span><strong id="sumType">Пока не выбран</strong></div>
+          <div class="summary-row"><span>Место</span><strong id="sumVenue">Можно выбрать ниже</strong></div>
+          <div class="summary-row" id="foodRow"><span>Еда</span><strong id="sumFood">—</strong></div>
+        </div>
+
+        <div class="action-card">
+          <div class="step">Финальный шаг</div>
+          <h2>Готово?</h2>
+          <p>Нажми кнопку — я соберу твой выбор в аккуратный текст, который можно сразу отправить.</p>
+          <button class="primary" id="copyBtn">Скопировать мой выбор 💌</button>
+          <button class="secondary" id="resetBtn">Выбрать заново</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Сделано с <span class="heart">♥</span> специально для Виктории · Ульяновск · август 2026
+    </div>
+  </main>
+
+  <div class="toast" id="toast">Скопировано ✨</div>
+  <script src="js/script.js"></script>
+</body>
+</html>
