@@ -171,7 +171,7 @@ const venueData = {
     async function sendSelection() {
       if (!validateSelection()) return;
 
-      if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_ACCESS_KEY_HERE") {
+      if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "c7caf6a7-9c19-4e3d-be8d-f835d043c0b8") {
         showStatus("Сначала вставь Web3Forms Access Key в js/script.js.", "error");
         return;
       }
