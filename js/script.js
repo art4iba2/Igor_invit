@@ -25,6 +25,14 @@ const venueData = {
       ]
     };
 
+    // ============================================================
+    // ВСТАВЬ СЮДА СВОЙ WEB3FORMS ACCESS KEY
+    // Пример: const WEB3FORMS_ACCESS_KEY = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+    // ============================================================
+    const WEB3FORMS_ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
+
+    const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
+
     const state = {
       date: "",
       time: "",
@@ -64,24 +72,31 @@ const venueData = {
       qa('input[name="venue"]').forEach(input => {
         input.addEventListener("change", () => {
           state.venue = input.value;
+          clearStatus();
           updateSummary();
         });
       });
     }
 
+    function restaurantDetails() {
+      return {
+        cuisine: q("#cuisine").value || "Не указано",
+        dish: q("#dish").value || "Не указано",
+        foodMood: q("#foodMood").value || "Не указано",
+        drink: q("#drink").value || "Не указано",
+        notes: q("#notes").value.trim() || "Нет"
+      };
+    }
+
     function foodSummary() {
       if (state.type !== "Ресторан") return "—";
       const parts = [];
-      const cuisine = q("#cuisine").value;
-      const dish = q("#dish").value;
-      const mood = q("#foodMood").value;
-      const drink = q("#drink").value;
-      const notes = q("#notes").value.trim();
-      if (cuisine) parts.push(cuisine);
-      if (dish) parts.push(dish);
-      if (mood) parts.push(mood);
-      if (drink) parts.push(drink);
-      if (notes) parts.push("Пожелание: " + notes);
+      const { cuisine, dish, foodMood, drink, notes } = restaurantDetails();
+      if (cuisine !== "Не указано") parts.push(cuisine);
+      if (dish !== "Не указано") parts.push(dish);
+      if (foodMood !== "Не указано") parts.push(foodMood);
+      if (drink !== "Не указано") parts.push(drink);
+      if (notes !== "Нет") parts.push("Пожелание: " + notes);
       return parts.length ? parts.join(" · ") : "Решим на месте";
     }
 
@@ -94,9 +109,36 @@ const venueData = {
       q("#foodRow").style.display = state.type === "Ресторан" ? "grid" : "none";
     }
 
+    function clearStatus() {
+      const status = q("#sendStatus");
+      status.textContent = "";
+      status.className = "send-status";
+    }
+
+    function showStatus(message, type) {
+      const status = q("#sendStatus");
+      status.textContent = message;
+      status.className = `send-status ${type}`;
+    }
+
+    function validateSelection() {
+      const missing = [];
+      if (!state.date) missing.push("дату");
+      if (!state.time) missing.push("время");
+      if (!state.type) missing.push("формат");
+      if (state.type && !state.venue) missing.push("место");
+
+      if (missing.length) {
+        showStatus(`Пожалуйста, выбери ${missing.join(", ")} ✨`, "error");
+        return false;
+      }
+      return true;
+    }
+
     qa('input[name="date"]').forEach(input => {
       input.addEventListener("change", () => {
         state.date = input.value;
+        clearStatus();
         updateSummary();
       });
     });
@@ -104,6 +146,7 @@ const venueData = {
     qa('input[name="time"]').forEach(input => {
       input.addEventListener("change", () => {
         state.time = input.value;
+        clearStatus();
         updateSummary();
       });
     });
@@ -114,46 +157,79 @@ const venueData = {
         state.venue = "";
         renderVenues(state.type);
         q("#restaurantOptions").classList.toggle("show", state.type === "Ресторан");
+        clearStatus();
         updateSummary();
       });
     });
 
     ["#cuisine", "#dish", "#foodMood", "#drink", "#notes"].forEach(sel => {
-      q(sel).addEventListener(sel === "#notes" ? "input" : "change", updateSummary);
+      q(sel).addEventListener(sel === "#notes" ? "input" : "change", () => {
+        clearStatus();
+        updateSummary();
+      });
     });
 
-    function buildText() {
-      const lines = [
-        "Мой выбор для нашего вечера ✨",
-        "",
-        `📅 Дата: ${state.date || "не выбрана"}`,
-        `🕒 Время: ${state.time || "не выбрано"}`,
-        `📍 Формат: ${state.type || "не выбран"}`,
-        `💫 Место: ${state.venue || "можем решить вместе"}`
-      ];
-      if (state.type === "Ресторан") {
-        lines.push(`🍽️ По еде: ${foodSummary()}`);
+    async function sendSelection() {
+      if (!validateSelection()) return;
+
+      if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_ACCESS_KEY_HERE") {
+        showStatus("Сначала вставь Web3Forms Access Key в js/script.js.", "error");
+        return;
       }
-      lines.push("", "Жду наш вечер 💜");
-      return lines.join("\n");
+
+      const sendBtn = q("#sendBtn");
+      const originalText = sendBtn.textContent;
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Отправляю…";
+      showStatus("Отправляю твой выбор…", "loading");
+
+      const payload = {
+        access_key: WEB3FORMS_ACCESS_KEY,
+        subject: "💌 Виктория выбрала наш вечер",
+        from_name: "Сайт-приглашение для Виктории",
+        "Дата": state.date,
+        "Время": state.time,
+        "Формат": state.type,
+        "Место": state.venue
+      };
+
+      if (state.type === "Ресторан") {
+        const food = restaurantDetails();
+        payload["Кухня"] = food.cuisine;
+        payload["Блюдо"] = food.dish;
+        payload["Формат еды"] = food.foodMood;
+        payload["Напитки"] = food.drink;
+        payload["Пожелания"] = food.notes;
+      }
+
+      try {
+        const response = await fetch(WEB3FORMS_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Не удалось отправить форму");
+        }
+
+        sendBtn.textContent = "Отправлено ✓";
+        showStatus("Готово! Выбор отправлен 💜 Теперь встреча официально запланирована ✨", "success");
+      } catch (error) {
+        console.error("Web3Forms error:", error);
+        sendBtn.textContent = originalText;
+        showStatus("Не получилось отправить. Проверь интернет и Access Key и попробуй ещё раз.", "error");
+      } finally {
+        sendBtn.disabled = false;
+      }
     }
 
-    q("#copyBtn").addEventListener("click", async () => {
-      const text = buildText();
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        ta.remove();
-      }
-      const toast = q("#toast");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 1800);
-    });
+    q("#sendBtn").addEventListener("click", sendSelection);
 
     q("#resetBtn").addEventListener("click", () => {
       qa('input[type="radio"]').forEach(i => i.checked = false);
@@ -162,6 +238,8 @@ const venueData = {
       state.date = state.time = state.type = state.venue = "";
       q("#venueList").innerHTML = "";
       q("#restaurantOptions").classList.remove("show");
+      q("#sendBtn").textContent = "Отправить мой выбор 💌";
+      clearStatus();
       updateSummary();
       window.scrollTo({top: 0, behavior: "smooth"});
     });

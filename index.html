@@ -155,8 +155,9 @@
         <div class="action-card">
           <div class="step">Финальный шаг</div>
           <h2>Готово?</h2>
-          <p>Нажми кнопку — я соберу твой выбор в аккуратный текст, который можно сразу отправить.</p>
-          <button class="primary" id="copyBtn">Скопировать мой выбор 💌</button>
+          <p>Нажми кнопку — твой выбор отправится мне, и я сразу буду знать наш план 💌</p>
+          <button class="primary" id="sendBtn">Отправить мой выбор 💌</button>
+          <div class="send-status" id="sendStatus" role="status" aria-live="polite"></div>
           <button class="secondary" id="resetBtn">Выбрать заново</button>
         </div>
       </div>
@@ -167,7 +168,6 @@
     </div>
   </main>
 
-  <div class="toast" id="toast">Скопировано ✨</div>
-  <script src="js/script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
