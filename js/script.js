@@ -1,9 +1,9 @@
 const venueData = {
       "Ресторан": [
-        {name:"Хочу Пури", meta:"Грузинский ресторан · пер. Кузнецова 3А", value:"Хочу Пури — пер. Кузнецова 3А"},
-        {name:"По чесноку", meta:"Смешанная кухня · Московское шоссе 108", value:"По чесноку — Московское шоссе 108"},
-        {name:"Антресоль", meta:"Грузинский ресторан · Московское шоссе 108", value:"Антресоль — Московское шоссе 108"},
-        {name:"Мидийное место", meta:"Ресторан с морепродуктами · ул. Спасская 19/9", value:"Мидийное место — ул. Спасская 19/9"}
+        {name:"Хочу Пури", meta:"Грузинский ресторан · пер. Кузнецова, 3А", value:"Хочу Пури — пер. Кузнецова, 3А"},
+        {name:"По чесноку", meta:"Смешанная кухня · Московское шоссе, 108", value:"По чесноку — Московское шоссе, 108"},
+        {name:"Антресоль", meta:"Грузинский ресторан · Московское шоссе, 108", value:"Антресоль — Московское шоссе, 108"},
+        {name:"Мидийное место", meta:"Ресторан с морепродуктами · ул. Спасская, 19/9", value:"Мидийное место — ул. Спасская, 19/9"}
       ],
       "Бар": [
         {name:"ЗАХОДИ, Я НАСТАИВАЮ", meta:"Бар · ул. Гончарова, 21А", value:"ЗАХОДИ, Я НАСТАИВАЮ — ул. Гончарова, 21А"},
@@ -20,7 +20,8 @@ const venueData = {
       "Кинотеатр": [
         {name:"Синема Парк Аква Молл", meta:"ТРЦ Аквамолл · Московское ш., 108", value:"Синема Парк Аква Молл — Московское ш., 108"},
         {name:"Луна", meta:"Камышинская ул., 43А", value:"Кинотеатр «Луна» — Камышинская ул., 43А"},
-        {name:"Матрица", meta:"Московское ш., 91", value:"Кинотеатр «Матрица» — Московское ш., 91"}
+        {name:"Матрица", meta:"Московское ш., 91", value:"Кинотеатр «Матрица» — Московское ш., 91"},
+        {name:"Люмьер", meta:"ул. Радищева, 148", value:"Кинотеатр «Люмьер» — ул. Радищева, 148"}
       ]
     };
 
@@ -79,7 +80,6 @@ const venueData = {
 
     function restaurantDetails() {
       return {
-        cuisine: q("#cuisine").value || "Не указано",
         dish: q("#dish").value || "Не указано",
         foodMood: q("#foodMood").value || "Не указано",
         drink: q("#drink").value || "Не указано",
@@ -90,8 +90,7 @@ const venueData = {
     function foodSummary() {
       if (state.type !== "Ресторан") return "—";
       const parts = [];
-      const { cuisine, dish, foodMood, drink, notes } = restaurantDetails();
-      if (cuisine !== "Не указано") parts.push(cuisine);
+      const { dish, foodMood, drink, notes } = restaurantDetails();
       if (dish !== "Не указано") parts.push(dish);
       if (foodMood !== "Не указано") parts.push(foodMood);
       if (drink !== "Не указано") parts.push(drink);
@@ -194,12 +193,16 @@ const venueData = {
 
       if (state.type === "Ресторан") {
         const food = restaurantDetails();
-        payload["Кухня"] = food.cuisine;
         payload["Блюдо"] = food.dish;
         payload["Формат еды"] = food.foodMood;
         payload["Напитки"] = food.drink;
         payload["Пожелания"] = food.notes;
       }
+
+      // Не даём запросу зависнуть бесконечно.
+      // Через 12 секунд он будет принудительно отменён.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       try {
         const response = await fetch(WEB3FORMS_ENDPOINT, {
@@ -208,22 +211,48 @@ const venueData = {
             "Content-Type": "application/json",
             "Accept": "application/json"
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          signal: controller.signal
         });
 
-        const result = await response.json();
+        // Сначала читаем ответ как текст, чтобы корректно обработать
+        // даже неожиданный/не-JSON ответ сервера.
+        const responseText = await response.text();
+
+        let result = {};
+        try {
+          result = responseText ? JSON.parse(responseText) : {};
+        } catch {
+          throw new Error("Сервис вернул некорректный ответ");
+        }
 
         if (!response.ok || !result.success) {
-          throw new Error(result.message || "Не удалось отправить форму");
+          throw new Error(result.message || `Ошибка отправки (${response.status})`);
         }
 
         sendBtn.textContent = "Отправлено ✓";
-        showStatus("Готово! Выбор отправлен 💜 Теперь встреча официально запланирована ✨", "success");
+        showStatus(
+          "Готово! Выбор отправлен 💜 Теперь встреча официально запланирована ✨",
+          "success"
+        );
       } catch (error) {
         console.error("Web3Forms error:", error);
+
         sendBtn.textContent = originalText;
-        showStatus("Не получилось отправить. Проверь интернет и Access Key и попробуй ещё раз.", "error");
+
+        if (error.name === "AbortError") {
+          showStatus(
+            "Сервис не ответил за 12 секунд. Проверь интернет, отключи блокировщик рекламы/VPN и попробуй ещё раз.",
+            "error"
+          );
+        } else {
+          showStatus(
+            `Не получилось отправить: ${error.message || "неизвестная ошибка"}. Попробуй ещё раз.`,
+            "error"
+          );
+        }
       } finally {
+        clearTimeout(timeoutId);
         sendBtn.disabled = false;
       }
     }
@@ -232,7 +261,7 @@ const venueData = {
 
     q("#resetBtn").addEventListener("click", () => {
       qa('input[type="radio"]').forEach(i => i.checked = false);
-      ["#cuisine", "#dish", "#foodMood", "#drink"].forEach(s => q(s).selectedIndex = 0);
+      ["#dish", "#foodMood", "#drink"].forEach(s => q(s).selectedIndex = 0);
       q("#notes").value = "";
       state.date = state.time = state.type = state.venue = "";
       q("#venueList").innerHTML = "";
