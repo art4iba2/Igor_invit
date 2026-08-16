@@ -171,7 +171,7 @@ const venueData = {
     async function sendSelection() {
       if (!validateSelection()) return;
 
-      if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "c7caf6a7-9c19-4e3d-be8d-f835d043c0b8") {
+      if (!WEB3FORMS_ACCESS_KEY || WEB3FORMS_ACCESS_KEY === "YOUR_ACCESS_KEY_HERE") {
         showStatus("Сначала вставь Web3Forms Access Key в js/script.js.", "error");
         return;
       }
@@ -194,6 +194,7 @@ const venueData = {
 
       if (state.type === "Ресторан") {
         const food = restaurantDetails();
+        payload["Кухня"] = food.cuisine;
         payload["Блюдо"] = food.dish;
         payload["Формат еды"] = food.foodMood;
         payload["Напитки"] = food.drink;
