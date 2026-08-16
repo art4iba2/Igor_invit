@@ -78,8 +78,22 @@
 
         <div class="restaurant-options" id="restaurantOptions">
           <h3>А теперь — гастрономическая часть 😌</h3>
-          <p>Можно выбрать блюдо, формат еды, напитки и дополнительные пожелания.</p>
+          <p>Можно выбрать настроение по еде, даже если конкретный ресторан пока не определён.</p>
           <div class="field-grid">
+            <label class="field">
+              <span>Предпочтительная кухня</span>
+              <select id="cuisine">
+                <option value="">Не важно — удиви меня</option>
+                <option>Грузинская</option>
+                <option>Русская</option>
+                <option>Итальянская</option>
+                <option>Европейская</option>
+                <option>Азиатская</option>
+                <option>Японская</option>
+                <option>Паназиатская</option>
+              </select>
+            </label>
+
             <label class="field">
               <span>Что хочется больше всего</span>
               <select id="dish">
@@ -153,6 +167,7 @@
     </div>
   </main>
 
-    <script src="js/script.js"></script>
+  <div class="toast" id="toast">Скопировано ✨</div>
+  <script src="js/script.js"></script>
 </body>
 </html>

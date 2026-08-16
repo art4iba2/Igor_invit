@@ -20,12 +20,9 @@ const venueData = {
       "Кинотеатр": [
         {name:"Синема Парк Аква Молл", meta:"ТРЦ Аквамолл · Московское ш., 108", value:"Синема Парк Аква Молл — Московское ш., 108"},
         {name:"Луна", meta:"Камышинская ул., 43А", value:"Кинотеатр «Луна» — Камышинская ул., 43А"},
-        {name:"Матрица", meta:"Московское ш., 91", value:"Кинотеатр «Матрица» — Московское ш., 91"},
-        {name:"Люмьер", meta:"ул. Радищева, 148", value:"Кинотеатр «Люмьер» — ул. Радищева, 148"}
+        {name:"Матрица", meta:"Московское ш., 91", value:"Кинотеатр «Матрица» — Московское ш., 91"}
       ]
     };
-
-    // ============================================================
 
     const state = {
       date: "",
@@ -66,28 +63,24 @@ const venueData = {
       qa('input[name="venue"]').forEach(input => {
         input.addEventListener("change", () => {
           state.venue = input.value;
-            updateSummary();
+          updateSummary();
         });
       });
-    }
-
-    function restaurantDetails() {
-      return {
-        dish: q("#dish").value || "Не указано",
-        foodMood: q("#foodMood").value || "Не указано",
-        drink: q("#drink").value || "Не указано",
-        notes: q("#notes").value.trim() || "Нет"
-      };
     }
 
     function foodSummary() {
       if (state.type !== "Ресторан") return "—";
       const parts = [];
-      const { dish, foodMood, drink, notes } = restaurantDetails();
-      if (dish !== "Не указано") parts.push(dish);
-      if (foodMood !== "Не указано") parts.push(foodMood);
-      if (drink !== "Не указано") parts.push(drink);
-      if (notes !== "Нет") parts.push("Пожелание: " + notes);
+      const cuisine = q("#cuisine").value;
+      const dish = q("#dish").value;
+      const mood = q("#foodMood").value;
+      const drink = q("#drink").value;
+      const notes = q("#notes").value.trim();
+      if (cuisine) parts.push(cuisine);
+      if (dish) parts.push(dish);
+      if (mood) parts.push(mood);
+      if (drink) parts.push(drink);
+      if (notes) parts.push("Пожелание: " + notes);
       return parts.length ? parts.join(" · ") : "Решим на месте";
     }
 
@@ -100,6 +93,34 @@ const venueData = {
       q("#foodRow").style.display = state.type === "Ресторан" ? "grid" : "none";
     }
 
+    qa('input[name="date"]').forEach(input => {
+      input.addEventListener("change", () => {
+        state.date = input.value;
+        updateSummary();
+      });
+    });
+
+    qa('input[name="time"]').forEach(input => {
+      input.addEventListener("change", () => {
+        state.time = input.value;
+        updateSummary();
+      });
+    });
+
+    qa('input[name="type"]').forEach(input => {
+      input.addEventListener("change", () => {
+        state.type = input.value;
+        state.venue = "";
+        renderVenues(state.type);
+        q("#restaurantOptions").classList.toggle("show", state.type === "Ресторан");
+        updateSummary();
+      });
+    });
+
+    ["#dish", "#foodMood", "#drink", "#notes"].forEach(sel => {
+      q(sel).addEventListener(sel === "#notes" ? "input" : "change", updateSummary);
+    });
+
     function buildText() {
       const lines = [
         "Мой выбор для нашего вечера ✨",
@@ -109,22 +130,15 @@ const venueData = {
         `📍 Формат: ${state.type || "не выбран"}`,
         `💫 Место: ${state.venue || "можем решить вместе"}`
       ];
-
       if (state.type === "Ресторан") {
-        const food = restaurantDetails();
-        lines.push(`🍽️ Блюдо: ${food.dish}`);
-        lines.push(`🥂 Формат еды: ${food.foodMood}`);
-        lines.push(`🍹 Напитки: ${food.drink}`);
-        lines.push(`💭 Пожелания: ${food.notes}`);
+        lines.push(`🍽️ По еде: ${foodSummary()}`);
       }
-
       lines.push("", "Жду наш вечер 💜");
       return lines.join("\n");
     }
 
     q("#copyBtn").addEventListener("click", async () => {
       const text = buildText();
-
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -135,16 +149,14 @@ const venueData = {
         document.execCommand("copy");
         ta.remove();
       }
-
       const toast = q("#toast");
-      toast.textContent = "Скопировано ✨";
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 1800);
     });
 
     q("#resetBtn").addEventListener("click", () => {
       qa('input[type="radio"]').forEach(i => i.checked = false);
-      ["#dish", "#foodMood", "#drink"].forEach(s => q(s).selectedIndex = 0);
+      ["#cuisine", "#dish", "#foodMood", "#drink"].forEach(s => q(s).selectedIndex = 0);
       q("#notes").value = "";
       state.date = state.time = state.type = state.venue = "";
       q("#venueList").innerHTML = "";

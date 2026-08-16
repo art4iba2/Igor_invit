@@ -339,25 +339,6 @@
       background: #f4edf5;
     }
 
-    button:disabled {
-      opacity: .68;
-      cursor: wait;
-      transform: none !important;
-      box-shadow: none;
-    }
-
-    .send-status {
-      min-height: 22px;
-      margin-top: 12px;
-      font-size: 13px;
-      line-height: 1.45;
-      font-weight: 750;
-      text-align: center;
-    }
-    .send-status.loading { color: var(--muted); }
-    .send-status.success { color: #567a61; }
-    .send-status.error { color: #a14f61; }
-
     .toast {
       position: fixed;
       left: 50%;
